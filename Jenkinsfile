@@ -1,4 +1,3 @@
-
 pipeline {
     agent any
 
@@ -58,14 +57,17 @@ pipeline {
 
         stage('Update K8s Manifest for GitOps') {
             steps {
-                sh '''
-                sed -i "s|image: .*|image: $DOCKER_IMAGE:$BUILD_NUMBER|" k8s/deployment.yaml
-                git config --global user.email "jenkins@example.com"
-                git config --global user.name "Jenkins CI"
-                git add k8s/deployment.yaml
-                git commit -m "Update image to $DOCKER_IMAGE:$BUILD_NUMBER"
-                git push origin main
-                '''
+                withCredentials([usernamePassword(credentialsId: 'github-creds', usernameVariable: 'GIT_USER', passwordVariable: 'GIT_PASS')]) {
+                    sh '''
+                    sed -i "s|image: .*|image: $DOCKER_IMAGE:$BUILD_NUMBER|" k8s/deployment.yaml
+                    git config --global user.email "jenkins@example.com"
+                    git config --global user.name "Jenkins CI"
+                    git add k8s/deployment.yaml
+                    git commit -m "Update image to $DOCKER_IMAGE:$BUILD_NUMBER"
+                    git remote set-url origin https://${GIT_USER}:${GIT_PASS}@github.com/iDL08/JenkinsPrac.git
+                    git push origin main
+                    '''
+                }
             }
         }
 
