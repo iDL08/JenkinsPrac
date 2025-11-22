@@ -17,6 +17,6 @@ spec:
     spec:
       containers:
         - name: demo-app
-          image: idl0828/demo-app:108
+          image: idl0828/demo-app:109
           ports:
             - containerPort: 8080
